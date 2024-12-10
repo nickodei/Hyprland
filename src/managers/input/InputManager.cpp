@@ -808,6 +808,8 @@ void CInputManager::onMouseWheel(IPointer::SAxisEvent e) {
             //             simulateMouseMovement();
             //     }
             // }
+
+            simulateMouseMovement();
         }
     }
 
