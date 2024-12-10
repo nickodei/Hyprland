@@ -798,16 +798,16 @@ void CInputManager::onMouseWheel(IPointer::SAxisEvent e) {
                 }
             }
 
-            if (g_pSeatManager->state.pointerFocus) {
-                const auto PMONITOR = isLocked() && g_pCompositor->m_pLastMonitor ? g_pCompositor->m_pLastMonitor.lock() : g_pCompositor->getMonitorFromCursor();
-
-                if (!PMONITOR || !*PSPECIALFALLTHRU || !PMONITOR->activeSpecialWorkspace) {
-                    const auto PCURRWINDOW = g_pCompositor->getWindowFromSurface(g_pSeatManager->state.pointerFocus.lock());
-
-                    if (*PFOLLOWMOUSE == 1 && PCURRWINDOW && PWINDOW != PCURRWINDOW)
-                        simulateMouseMovement();
-                }
-            }
+            // if (g_pSeatManager->state.pointerFocus) {
+            //     const auto PMONITOR = isLocked() && g_pCompositor->m_pLastMonitor ? g_pCompositor->m_pLastMonitor.lock() : g_pCompositor->getMonitorFromCursor();
+            //
+            //     if (!PMONITOR || !*PSPECIALFALLTHRU || !PMONITOR->activeSpecialWorkspace) {
+            //         const auto PCURRWINDOW = g_pCompositor->getWindowFromSurface(g_pSeatManager->state.pointerFocus.lock());
+            //
+            //         if (*PFOLLOWMOUSE == 1 && PCURRWINDOW && PWINDOW != PCURRWINDOW)
+            //             simulateMouseMovement();
+            //     }
+            // }
         }
     }
 
