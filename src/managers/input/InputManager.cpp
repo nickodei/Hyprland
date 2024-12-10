@@ -760,6 +760,7 @@ void CInputManager::onMouseWheel(IPointer::SAxisEvent e) {
     static auto PTOUCHPADSCROLLFACTOR = CConfigValue<Hyprlang::FLOAT>("input:touchpad:scroll_factor");
     static auto PEMULATEDISCRETE      = CConfigValue<Hyprlang::INT>("input:emulate_discrete_scroll");
     static auto PFOLLOWMOUSE          = CConfigValue<Hyprlang::INT>("input:follow_mouse");
+    static auto PSPECIALFALLTHRU      = CConfigValue<Hyprlang::INT>("input:special_fallthrough");
 
     auto        factor = (*PTOUCHPADSCROLLFACTOR <= 0.f || e.source == WL_POINTER_AXIS_SOURCE_FINGER ? *PTOUCHPADSCROLLFACTOR : *PINPUTSCROLLFACTOR);
 
@@ -773,7 +774,7 @@ void CInputManager::onMouseWheel(IPointer::SAxisEvent e) {
 
     if (!m_bLastFocusOnLS) {
         const auto MOUSECOORDS = g_pInputManager->getMouseCoordsInternal();
-        const auto PWINDOW     = g_pCompositor->vectorToWindowUnified(MOUSECOORDS, RESERVED_EXTENTS | INPUT_EXTENTS | ALLOW_FLOATING);
+        const auto PWINDOW  = g_pCompositor->vectorToWindowUnified(MOUSECOORDS, RESERVED_EXTENTS | INPUT_EXTENTS | ALLOW_FLOATING);
 
         if (PWINDOW) {
             if (PWINDOW->checkInputOnDecos(INPUT_TYPE_AXIS, MOUSECOORDS, e))
@@ -798,10 +799,14 @@ void CInputManager::onMouseWheel(IPointer::SAxisEvent e) {
             }
 
             if (g_pSeatManager->state.pointerFocus) {
-                const auto PCURRWINDOW = g_pCompositor->getWindowFromSurface(g_pSeatManager->state.pointerFocus.lock());
+                const auto PMONITOR = isLocked() && g_pCompositor->m_pLastMonitor ? g_pCompositor->m_pLastMonitor.lock() : g_pCompositor->getMonitorFromCursor();
 
-                if (*PFOLLOWMOUSE == 1 && PCURRWINDOW && PWINDOW != PCURRWINDOW)
-                    simulateMouseMovement();
+                if (!PMONITOR || !*PSPECIALFALLTHRU || !PMONITOR->activeSpecialWorkspace) {
+                    const auto PCURRWINDOW = g_pCompositor->getWindowFromSurface(g_pSeatManager->state.pointerFocus.lock());
+
+                    if (*PFOLLOWMOUSE == 1 && PCURRWINDOW && PWINDOW != PCURRWINDOW)
+                        simulateMouseMovement();
+                }
             }
         }
     }
